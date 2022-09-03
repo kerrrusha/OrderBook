@@ -12,22 +12,19 @@ public class Command {
     }
 
     public int instructionsCount() {
+        if (command.trim().length() == 0)
+            return 0;
         return StringUtils.countMatches(command, SEPARATOR) + 1;
     }
     public String getInstructionAtIndex(int positionIndex) {
         if (positionIndex > instructionsCount())
             throw new InstructionIndexOutOfBoundsException("Instruction index was out of bounds.");
-//        if (positionIndex == 0) {
-//            int endIndex = command.indexOf(SEPARATOR);
-//            return command.substring(0, endIndex);
-//        }
         int startIndex = 0;
-        int count = 0;
-        while (count != positionIndex) {
-            startIndex = command.substring(startIndex).indexOf(SEPARATOR);
-            count++;
+        for (int i = 0; i < positionIndex; i++) {
+            startIndex = command.substring(startIndex).indexOf(SEPARATOR) + 1;
         }
         int endIndex = command.substring(startIndex).indexOf(SEPARATOR);
+        endIndex = endIndex == -1 ? command.length() : endIndex + startIndex;
         return command.substring(startIndex, endIndex);
     }
 }
