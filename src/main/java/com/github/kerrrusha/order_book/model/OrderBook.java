@@ -1,4 +1,4 @@
-package com.github.kerrrusha.model;
+package com.github.kerrrusha.order_book.model;
 
 import java.util.List;
 import java.util.Optional;
