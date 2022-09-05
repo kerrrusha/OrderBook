@@ -1,9 +1,10 @@
 package com.github.kerrrusha.order_book.command;
 
 public enum CommandType {
-    UPDATE('v'),
+    ANY('_'),
     QUERY('q'),
-    ORDER('o');
+    ORDER('o'),
+    UPDATE('v');
 
     final char CODE;
 

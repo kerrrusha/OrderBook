@@ -10,7 +10,7 @@ public class OrderBook {
         this.orders = orders;
     }
 
-    public Optional<Order> getOrderByPrice(int price) {
-        return orders.stream().filter(t->t.getPrice() == price).findFirst();
+    public Optional<Order> getOrderByPrice(Price price) {
+        return orders.stream().filter(t->t.getPrice().equals(price)).findFirst();
     }
 }
