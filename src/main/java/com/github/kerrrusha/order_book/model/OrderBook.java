@@ -9,7 +9,7 @@ public class OrderBook {
     private final List<Order> orders;
 
     public OrderBook() {
-        this.orders = List.of();
+        this.orders = new ArrayList<>();
     }
     public OrderBook(List<Order> orders) {
         this.orders = orders;
@@ -30,10 +30,5 @@ public class OrderBook {
     }
     public void add(Order newOrder) {
         orders.add(newOrder);
-    }
-
-    @Override
-    public String toString() {
-        return ;
     }
 }
