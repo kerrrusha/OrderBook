@@ -12,7 +12,7 @@ import com.github.kerrrusha.order_book.command.typed_command.update.UpdateBidCom
 public class CommandParser {
     private static final String PARSE_UNSUCCESSFUL = "Cannot parse command string into typed command object";
 
-    public static TypedCommand parseCommand(String commandStr) {
+    public static TypedCommand parseCommand(String commandStr) throws CommandParseUnsuccessfulException {
         TypedCommand typedCommand;
 
         typedCommand = tryParseUpdate(commandStr);

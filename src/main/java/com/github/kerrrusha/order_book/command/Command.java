@@ -1,6 +1,7 @@
 package com.github.kerrrusha.order_book.command;
 
 import com.github.kerrrusha.order_book.StringUtils;
+import com.github.kerrrusha.order_book.model.Price;
 
 public class Command {
     protected static final char SEPARATOR = ',';
@@ -31,5 +32,19 @@ public class Command {
     @Override
     public String toString() {
         return "[" + command + "]";
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof Command)) {
+            return false;
+        }
+
+        Command other = (Command) o;
+
+        return this.command == other.command;
     }
 }

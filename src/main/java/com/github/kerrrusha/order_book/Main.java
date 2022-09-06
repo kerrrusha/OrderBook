@@ -1,5 +1,6 @@
 package com.github.kerrrusha.order_book;
 
+import com.github.kerrrusha.order_book.command.CommandOrderBookExecutor;
 import com.github.kerrrusha.order_book.command.CommandParser;
 import com.github.kerrrusha.order_book.command.CommandParseUnsuccessfulException;
 import com.github.kerrrusha.order_book.command.typed_command.*;
@@ -35,12 +36,13 @@ public class Main {
 
         if (StringUtils.stringIsInvalid(result))
             return;
+        result = removeStringLastNewLineCharacter(result);
 
         createOutputFileIfNotExists();
         writeResult(result);
     }
 
-    private static String readCommands() {
+    public static String readCommands() {
         String absolutePath = new File(INPUT_FILEPATH).getAbsolutePath();
         FileReader reader = new FileReader(absolutePath);
         String fileContent = "";
@@ -51,12 +53,15 @@ public class Main {
         }
         return fileContent;
     }
-    private static TypedCommand[] getTypedCommands(String[] splittedCommandsStr) {
+    public static TypedCommand getTypedCommand(String commandStr) throws CommandParseUnsuccessfulException {
+        return CommandParser.parseCommand(commandStr);
+    }
+    public static TypedCommand[] getTypedCommands(String[] splittedCommandsStr) {
         List<TypedCommand> typedCommands = new ArrayList<>();
         for (String commandStr : splittedCommandsStr) {
             TypedCommand command;
             try {
-                command = CommandParser.parseCommand(commandStr);
+                command = getTypedCommand(commandStr);
             } catch (CommandParseUnsuccessfulException e) {
                 continue;
             }
@@ -65,7 +70,7 @@ public class Main {
 
         return typedCommands.toArray(new TypedCommand[0]);
     }
-    private static String executeCommands(TypedCommand[] typedCommands) throws InvalidPriceStringException, InvalidSizeStringException {
+    public static String executeCommands(TypedCommand[] typedCommands) throws InvalidPriceStringException, InvalidSizeStringException {
         OrderBook book = new OrderBook();
         StringBuilder result = new StringBuilder();
 
@@ -82,7 +87,7 @@ public class Main {
             new FileOutputStream(OUTPUT_FILEPATH, true).close();
         } catch (Exception ignored) {}
     }
-    private static void writeResult(String data) {
+    public static void writeResult(String data) {
         String absolutePath = new File(OUTPUT_FILEPATH).getAbsolutePath();
         FileWriter writer = new FileWriter(absolutePath);
         try {
@@ -91,7 +96,15 @@ public class Main {
             e.printStackTrace();
         }
     }
-    private static String[] splitCommandsString(String commandsStr) {
+    public static String[] splitCommandsString(String commandsStr) {
         return commandsStr.split(FILE_COMMANDS_SEPARATOR);
+    }
+    public static String removeStringLastNewLineCharacter(String str) {
+        char newLineCharacter = '\n';
+        int NEW_CHARACTER_LENGTH = 1;
+        if (StringUtils.stringIsInvalid(str) || str.length() < NEW_CHARACTER_LENGTH)
+            return str;
+        int lastNewLineIndex = str.lastIndexOf(newLineCharacter);
+        return str.substring(0, lastNewLineIndex);
     }
 }

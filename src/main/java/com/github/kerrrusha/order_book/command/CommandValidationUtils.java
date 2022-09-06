@@ -8,6 +8,8 @@ public class CommandValidationUtils {
     public static boolean invalidCommandType(String commandStr, CommandType commandType) {
         if (StringUtils.stringIsInvalid(commandStr))
             return true;
+        if (commandType == CommandType.ANY)
+            return firstParameterIsNotLetter(commandStr);
         if (commandStr.length() == 1)
             return invalidSingleCase(commandStr, commandType);
         return invalidDefaultCase(commandStr, commandType);
@@ -17,12 +19,18 @@ public class CommandValidationUtils {
     }
 
     private static boolean invalidSingleCase(String commandStr, CommandType commandType) {
-        return commandStr.equals(String.valueOf(commandType));
+        return !commandStr.equals(String.valueOf(commandType));
     }
     private static boolean invalidDefaultCase(String commandStr, CommandType commandType) {
-        return getCommandTypeWithSeparator(commandStr).equals(String.valueOf(commandType) + SEPARATOR);
+        return !getCommandTypeWithSeparator(commandStr).equals(String.valueOf(commandType) + SEPARATOR);
+    }
+    private static char getCommandType(String commandStr) {
+        return commandStr.charAt(0);
     }
     private static String getCommandTypeWithSeparator(String commandStr) {
         return commandStr.substring(0, 2);
+    }
+    private static boolean firstParameterIsNotLetter(String commandStr) {
+        return !Character.isLetter(getCommandType(commandStr));
     }
 }

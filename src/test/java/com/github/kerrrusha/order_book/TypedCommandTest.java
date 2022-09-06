@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TypedCommandTest {
@@ -22,8 +23,7 @@ public class TypedCommandTest {
                 )
         );
         for (String testCommandStr : inputs) {
-            assertThrows(InvalidCommandTypeException.class,
-                    () -> TypedCommand.parseCommand(testCommandStr));
+            assertDoesNotThrow(() -> TypedCommand.parseCommand(testCommandStr));
         }
     }
 
@@ -31,11 +31,10 @@ public class TypedCommandTest {
     public void parseCommandIncorrectTest() {
         List<String> inputs = new ArrayList<>(
                 List.of(
-                        "q,2",
+                        ",b,2",
                         "qq",
                         "u 2 5",
-                        "",
-                        null
+                        ""
                 )
         );
         for (String testCommandStr : inputs) {

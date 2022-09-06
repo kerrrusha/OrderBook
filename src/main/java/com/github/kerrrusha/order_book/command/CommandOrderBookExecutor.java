@@ -1,6 +1,8 @@
-package com.github.kerrrusha.order_book.command.typed_command;
+package com.github.kerrrusha.order_book.command;
 
-import com.github.kerrrusha.order_book.command.Command;
+import com.github.kerrrusha.order_book.command.typed_command.InvalidPriceStringException;
+import com.github.kerrrusha.order_book.command.typed_command.InvalidSizeStringException;
+import com.github.kerrrusha.order_book.command.typed_command.ValueOutOfRangeException;
 import com.github.kerrrusha.order_book.command.typed_command.order.OrderBuyCommand;
 import com.github.kerrrusha.order_book.command.typed_command.order.OrderSellCommand;
 import com.github.kerrrusha.order_book.command.typed_command.query.QueryBestAskCommand;
@@ -21,6 +23,9 @@ public class CommandOrderBookExecutor implements CommandExecutable {
         if (! (executeAt instanceof OrderBook) )
             throw new ClassCastException("Executable At object is not OrderBook instance");
         OrderBook book = (OrderBook) executeAt;
+
+        final String INNER_SEPARATOR = ",";
+        final String ENDLINE_SEPARATOR = "\n";
 
         StringBuilder result = new StringBuilder();
 
@@ -59,9 +64,9 @@ public class CommandOrderBookExecutor implements CommandExecutable {
             if(bestAskOrderOptional.isPresent()) {
                 bestAskOrder = bestAskOrderOptional.get();
                 result.append(bestAskOrder.getPrice()).
-                        append(" ").
+                        append(INNER_SEPARATOR).
                         append(bestAskOrder.getSize()).
-                        append("\n");
+                        append(ENDLINE_SEPARATOR);
             }
         }
         if (typedCommand instanceof QueryBestBidCommand) {
@@ -73,9 +78,9 @@ public class CommandOrderBookExecutor implements CommandExecutable {
             if(bestOrderOptional.isPresent()) {
                 bestOrder = bestOrderOptional.get();
                 result.append(bestOrder.getPrice()).
-                        append(" ").
+                        append(INNER_SEPARATOR).
                         append(bestOrder.getSize()).
-                        append("\n");
+                        append(ENDLINE_SEPARATOR);
             }
         }
         if (typedCommand instanceof QuerySizeCommand) {
@@ -86,7 +91,7 @@ public class CommandOrderBookExecutor implements CommandExecutable {
             if(orderOptional.isPresent()) {
                 Order order = orderOptional.get();
                 result.append(order.getSize()).
-                        append("\n");
+                        append(ENDLINE_SEPARATOR);
             }
         }
         if (typedCommand instanceof OrderBuyCommand) {
