@@ -1,7 +1,6 @@
 package com.github.kerrrusha.order_book.command.typed_command.update;
 
 import com.github.kerrrusha.order_book.command.Command;
-import com.github.kerrrusha.order_book.command.CommandValidationUtils;
 import com.github.kerrrusha.order_book.command.InvalidCommandTypeException;
 import com.github.kerrrusha.order_book.command.typed_command.InvalidCommandParametersException;
 import com.github.kerrrusha.order_book.command.typed_command.TypedCommand;

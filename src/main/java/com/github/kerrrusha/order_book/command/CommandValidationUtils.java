@@ -1,10 +1,12 @@
 package com.github.kerrrusha.order_book.command;
 
+import com.github.kerrrusha.order_book.StringUtils;
+
 import static com.github.kerrrusha.order_book.command.Command.SEPARATOR;
 
 public class CommandValidationUtils {
     public static boolean invalidCommandType(String commandStr, CommandType commandType) {
-        if (invalidString(commandStr))
+        if (StringUtils.stringIsInvalid(commandStr))
             return true;
         if (commandStr.length() == 1)
             return invalidSingleCase(commandStr, commandType);
@@ -14,9 +16,6 @@ public class CommandValidationUtils {
         return ! (0 <= index && index < instructionsCount);
     }
 
-    public static boolean invalidString(String str) {
-        return str != null && str.length() != 0;
-    }
     private static boolean invalidSingleCase(String commandStr, CommandType commandType) {
         return commandStr.equals(String.valueOf(commandType));
     }

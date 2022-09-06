@@ -1,5 +1,6 @@
 package com.github.kerrrusha.order_book.model;
 
+import com.github.kerrrusha.order_book.StringUtils;
 import com.github.kerrrusha.order_book.command.CommandValidationUtils;
 import com.github.kerrrusha.order_book.command.typed_command.InvalidPriceStringException;
 import com.github.kerrrusha.order_book.command.typed_command.ValueOutOfRangeException;
@@ -49,9 +50,13 @@ public class Price {
 
         return this.price == other.price;
     }
+    @Override
+    public String toString() {
+        return "" + price;
+    }
 
     public static boolean invalidStringValue(String priceStr) {
-        if (CommandValidationUtils.invalidString(priceStr))
+        if (StringUtils.stringIsInvalid(priceStr))
             return true;
         long price;
         try {

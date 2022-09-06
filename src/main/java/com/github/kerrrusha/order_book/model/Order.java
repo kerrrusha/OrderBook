@@ -36,8 +36,8 @@ public class Order {
         type = newType;
     }
 
-    /*public boolean equalsBy(String field, String toStringValue) throws NoSuchFieldException {
+    public boolean equalsBy(String field, String toStringFieldValue) throws NoSuchFieldException, IllegalAccessException {
         Field declaredField = this.getClass().getDeclaredField(field);
-        return declaredField.toString().equals(toStringValue);
-    }*/
+        return declaredField.get(this).toString().equals(toStringFieldValue);
+    }
 }

@@ -1,5 +1,6 @@
 package com.github.kerrrusha.order_book.model;
 
+import com.github.kerrrusha.order_book.StringUtils;
 import com.github.kerrrusha.order_book.command.CommandValidationUtils;
 import com.github.kerrrusha.order_book.command.typed_command.InvalidSizeStringException;
 import com.github.kerrrusha.order_book.command.typed_command.ValueOutOfRangeException;
@@ -35,8 +36,13 @@ public class Size {
         this.size = size;
     }
 
+    @Override
+    public String toString() {
+        return "" + size;
+    }
+
     public static boolean invalidStringValue(String sizeStr) {
-        if (CommandValidationUtils.invalidString(sizeStr))
+        if (StringUtils.stringIsInvalid(sizeStr))
             return true;
         long size;
         try {
