@@ -16,7 +16,7 @@ public class UpdateBidCommand extends UpdateCommand {
 
     public static UpdateBidCommand parseCommand(String commandStr)
             throws InvalidCommandTypeException {
-        TypedCommand.checkCommandString(commandStr);
+        TypedCommand.checkCommandString(commandStr, commandType);
         if (invalidParameters(commandStr))
             throw new InvalidCommandParametersException(INVALID_PARAMETERS);
         return new UpdateBidCommand(commandStr);

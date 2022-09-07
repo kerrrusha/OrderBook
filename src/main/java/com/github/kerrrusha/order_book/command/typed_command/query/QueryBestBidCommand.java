@@ -14,7 +14,7 @@ public class QueryBestBidCommand extends QueryCommand {
 
     public static QueryBestBidCommand parseCommand(String commandStr)
             throws InvalidCommandTypeException {
-        TypedCommand.checkCommandString(commandStr);
+        TypedCommand.checkCommandString(commandStr, commandType);
         if (invalidParameters(commandStr))
             throw new InvalidCommandParametersException(INVALID_PARAMETERS);
         return new QueryBestBidCommand(commandStr);

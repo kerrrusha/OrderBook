@@ -15,7 +15,7 @@ public class OrderBuyCommand extends OrderCommand {
 
     public static OrderBuyCommand parseCommand(String commandStr)
             throws InvalidCommandTypeException {
-        TypedCommand.checkCommandString(commandStr);
+        TypedCommand.checkCommandString(commandStr, commandType);
         if (invalidParameters(commandStr))
             throw new InvalidCommandParametersException(INVALID_PARAMETERS);
         return new OrderBuyCommand(commandStr);
