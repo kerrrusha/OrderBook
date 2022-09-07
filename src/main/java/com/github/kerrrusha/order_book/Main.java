@@ -18,6 +18,7 @@ public class Main {
     private static final String INPUT_FILEPATH = "input.txt";
     private static final String OUTPUT_FILEPATH = "output.txt";
     private static final String FILE_COMMANDS_SEPARATOR = "\n";
+    private static final String FILE_COMMANDS_LARGE_SEPARATOR = "\r\n";
 
     public static void main(String[] args) {
         String commandsStr = readCommands();
@@ -56,7 +57,7 @@ public class Main {
     public static TypedCommand getTypedCommand(String commandStr) throws CommandParseUnsuccessfulException {
         return CommandParser.parseCommand(commandStr);
     }
-    public static TypedCommand[] getTypedCommands(String[] splittedCommandsStr) {
+    private static TypedCommand[] getTypedCommands(String[] splittedCommandsStr) {
         List<TypedCommand> typedCommands = new ArrayList<>();
         for (String commandStr : splittedCommandsStr) {
             TypedCommand command;
@@ -87,7 +88,7 @@ public class Main {
             new FileOutputStream(OUTPUT_FILEPATH, true).close();
         } catch (Exception ignored) {}
     }
-    public static void writeResult(String data) {
+    private static void writeResult(String data) {
         String absolutePath = new File(OUTPUT_FILEPATH).getAbsolutePath();
         FileWriter writer = new FileWriter(absolutePath);
         try {
@@ -97,6 +98,8 @@ public class Main {
         }
     }
     public static String[] splitCommandsString(String commandsStr) {
+        if (commandsStr.contains(FILE_COMMANDS_LARGE_SEPARATOR))
+            return commandsStr.split(FILE_COMMANDS_LARGE_SEPARATOR);
         return commandsStr.split(FILE_COMMANDS_SEPARATOR);
     }
     public static String removeStringLastNewLineCharacter(String str) {
