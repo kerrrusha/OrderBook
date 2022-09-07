@@ -2,11 +2,9 @@ package com.github.kerrrusha.order_book.model;
 
 import com.github.kerrrusha.order_book.command.typed_command.ValueOutOfRangeException;
 
-import java.lang.reflect.Field;
-
 public class Order {
-    private Price price;
-    private Size size;
+    private final Price price;
+    private final Size size;
     private PriceLevelType type;
 
     public Order(Price price, Size size, PriceLevelType type) {
@@ -25,9 +23,6 @@ public class Order {
     public Price getPrice() {
         return price;
     }
-    public void setPrice(long newPrice) throws ValueOutOfRangeException {
-        price.set(newPrice);
-    }
 
     public PriceLevelType getType() {
         return type;
@@ -36,8 +31,7 @@ public class Order {
         type = newType;
     }
 
-    public boolean equalsBy(String field, String toStringFieldValue) throws NoSuchFieldException, IllegalAccessException {
-        Field declaredField = this.getClass().getDeclaredField(field);
-        return declaredField.get(this).toString().equals(toStringFieldValue);
+    public void buyShares(Size size) throws ValueOutOfRangeException {
+        this.size.subtract(size);
     }
 }
