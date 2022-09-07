@@ -1,0 +1,7 @@
+u,12,5,ask
+u,11,5,ask
+u,10,5,ask
+o,buy,12
+q,size,12
+q,size,11
+q,size,10

@@ -1,7 +1,6 @@
 package com.github.kerrrusha.order_book.model;
 
 import com.github.kerrrusha.order_book.StringUtils;
-import com.github.kerrrusha.order_book.command.CommandValidationUtils;
 import com.github.kerrrusha.order_book.command.typed_command.InvalidSizeStringException;
 import com.github.kerrrusha.order_book.command.typed_command.ValueOutOfRangeException;
 
@@ -14,19 +13,11 @@ public class Size {
     private Size(String sizeStr) {
         size = Long.parseLong(sizeStr);
     }
-    private Size(long size) {
-        this.size = size;
-    }
 
     public static Size parseSize(String sizeStr) throws InvalidSizeStringException {
         if (invalidStringValue(sizeStr))
             throw new InvalidSizeStringException(INVALID_STRING);
         return new Size(sizeStr);
-    }
-    public static Size valueOf(long size) throws ValueOutOfRangeException {
-        if (invalidValue(size))
-            throw new ValueOutOfRangeException(VALUE_OUT_OF_RANGE);
-        return new Size(size);
     }
 
     public long get() { return size; }
@@ -34,6 +25,15 @@ public class Size {
         if (invalidValue(size))
             throw new ValueOutOfRangeException(VALUE_OUT_OF_RANGE);
         this.size = size;
+    }
+    public void subtract(Size other) throws ValueOutOfRangeException {
+        set(this.size - other.size);
+    }
+    public boolean greaterThan(Size other) {
+        return this.size > other.size;
+    }
+    public boolean greaterThanOrEqual(Size other) {
+        return greaterThan(other) || this.size == other.size;
     }
 
     @Override

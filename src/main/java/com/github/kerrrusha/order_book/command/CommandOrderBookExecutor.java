@@ -12,127 +12,168 @@ import com.github.kerrrusha.order_book.command.typed_command.update.UpdateAskCom
 import com.github.kerrrusha.order_book.command.typed_command.update.UpdateBidCommand;
 import com.github.kerrrusha.order_book.model.*;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CommandOrderBookExecutor implements CommandExecutable {
+    private static final String INNER_SEPARATOR = ",";
+    private static final String ENDLINE_SEPARATOR = "\n";
+
     @Override
     public String execute(Command typedCommand, Object executeAt)
-            throws InvalidPriceStringException, InvalidSizeStringException {
+            throws InvalidPriceStringException, InvalidSizeStringException, ValueOutOfRangeException {
         if (! (executeAt instanceof OrderBook) )
             throw new ClassCastException("Executable At object is not OrderBook instance");
         OrderBook book = (OrderBook) executeAt;
 
-        final String INNER_SEPARATOR = ",";
-        final String ENDLINE_SEPARATOR = "\n";
-
         StringBuilder result = new StringBuilder();
 
-        Price price;
-        Size size;
-        PriceLevelType type;
-
         if (typedCommand instanceof UpdateAskCommand) {
-            String priceStr = typedCommand.getInstructionAtIndex(1);
-            String sizeStr = typedCommand.getInstructionAtIndex(2);
-
-            price = Price.parsePrice(priceStr);
-            size = Size.parseSize(sizeStr);
-            type = PriceLevelType.ASK;
-
-            Order order = new Order(price, size, type);
-            book.add(order);
+            executeUpdateAskCommand(typedCommand, book);
         }
         if (typedCommand instanceof UpdateBidCommand) {
-            String priceStr = typedCommand.getInstructionAtIndex(1);
-            String sizeStr = typedCommand.getInstructionAtIndex(2);
-
-            price = Price.parsePrice(priceStr);
-            size = Size.parseSize(sizeStr);
-            type = PriceLevelType.BID;
-
-            Order order = new Order(price, size, type);
-            book.add(order);
+            executeUpdateBidCommand(typedCommand, book);
         }
         if (typedCommand instanceof QueryBestAskCommand) {
-            List<Order> askOrders = book.getAskOrders();
-            Optional<Order> bestAskOrderOptional = askOrders.stream().
-                    min(Comparator.comparingLong(ord -> ord.getPrice().get()));
-
-            Order bestAskOrder;
-            if(bestAskOrderOptional.isPresent()) {
-                bestAskOrder = bestAskOrderOptional.get();
-                result.append(bestAskOrder.getPrice()).
-                        append(INNER_SEPARATOR).
-                        append(bestAskOrder.getSize()).
-                        append(ENDLINE_SEPARATOR);
-            }
+            Optional<String> queryResult = executeQueryBestAskCommand(book);
+            queryResult.ifPresent(result::append);
         }
         if (typedCommand instanceof QueryBestBidCommand) {
-            List<Order> orders = book.getBidOrders();
-            Optional<Order> bestOrderOptional = orders.stream().
-                    max(Comparator.comparingLong(ord -> ord.getPrice().get()));
-
-            Order bestOrder;
-            if(bestOrderOptional.isPresent()) {
-                bestOrder = bestOrderOptional.get();
-                result.append(bestOrder.getPrice()).
-                        append(INNER_SEPARATOR).
-                        append(bestOrder.getSize()).
-                        append(ENDLINE_SEPARATOR);
-            }
+            Optional<String> queryResult = executeQueryBestBidCommand(book);
+            queryResult.ifPresent(result::append);
         }
         if (typedCommand instanceof QuerySizeCommand) {
-            String priceStr = typedCommand.getInstructionAtIndex(2);
-            price = Price.parsePrice(priceStr);
-
-            Optional<Order> orderOptional = book.getOrderByPrice(price);
-            if(orderOptional.isPresent()) {
-                Order order = orderOptional.get();
-                result.append(order.getSize()).
-                        append(ENDLINE_SEPARATOR);
-            }
+            result.append(executeQuerySizeCommand(typedCommand, book));
         }
         if (typedCommand instanceof OrderBuyCommand) {
-            String sizeStr = typedCommand.getInstructionAtIndex(2);
-            size = Size.parseSize(sizeStr);
-
-            List<Order> askOrders = book.getAskOrders();
-            Optional<Order> bestAskOrderOptional = askOrders.stream().
-                    min(Comparator.comparingLong(ord -> ord.getPrice().get()));
-
-            Order bestAskOrder;
-            if (bestAskOrderOptional.isPresent()) {
-                bestAskOrder = bestAskOrderOptional.get();
-                long newSizeValue = bestAskOrder.getSize().get() - size.get();
-                try {
-                    bestAskOrder.setSize(newSizeValue);
-                } catch (ValueOutOfRangeException e) {
-                    e.printStackTrace();
-                }
-            }
+            executeOrderBuyCommand(typedCommand, book);
         }
         if (typedCommand instanceof OrderSellCommand) {
-            String sizeStr = typedCommand.getInstructionAtIndex(2);
-            size = Size.parseSize(sizeStr);
-
-            List<Order> bidOrders = book.getBidOrders();
-            Optional<Order> bestBidOrderOptional = bidOrders.stream().
-                    max(Comparator.comparingLong(ord -> ord.getPrice().get()));
-
-            Order bestBidOrder;
-            if (bestBidOrderOptional.isPresent()) {
-                bestBidOrder = bestBidOrderOptional.get();
-                long newSizeValue = bestBidOrder.getSize().get() - size.get();
-                try {
-                    bestBidOrder.setSize(newSizeValue);
-                } catch (ValueOutOfRangeException e) {
-                    e.printStackTrace();
-                }
-            }
+            executeOrderSellCommand(typedCommand, book);
         }
 
         return result.toString();
+    }
+
+    private static void executeUpdateAskCommand(Command typedCommand, OrderBook book) throws InvalidPriceStringException, InvalidSizeStringException, ValueOutOfRangeException {
+        String priceStr = typedCommand.getInstructionAtIndex(1);
+        String sizeStr = typedCommand.getInstructionAtIndex(2);
+
+        Price price = Price.parsePrice(priceStr);
+        Size size = Size.parseSize(sizeStr);
+        PriceLevelType type = PriceLevelType.ASK;
+
+        updateOrder(book, price, size, type);
+    }
+    private static void executeUpdateBidCommand(Command typedCommand, OrderBook book) throws InvalidPriceStringException, InvalidSizeStringException, ValueOutOfRangeException {
+        String priceStr = typedCommand.getInstructionAtIndex(1);
+        String sizeStr = typedCommand.getInstructionAtIndex(2);
+
+        Price price = Price.parsePrice(priceStr);
+        Size size = Size.parseSize(sizeStr);
+        PriceLevelType type = PriceLevelType.BID;
+
+        updateOrder(book, price, size, type);
+    }
+    private static Optional<String> executeQueryBestAskCommand(OrderBook book) {
+        Optional<String> result = Optional.empty();
+
+        List<Order> askOrders = book.getAskOrders();
+        Optional<Order> bestAskOrderOptional = askOrders.stream().
+                filter(order -> order.getSize().get() != 0).
+                min(Comparator.comparingLong(ord -> ord.getPrice().get()));
+
+        Order bestAskOrder;
+        if(bestAskOrderOptional.isPresent()) {
+            bestAskOrder = bestAskOrderOptional.get();
+            result = Optional.of(
+                    bestAskOrder.getPrice() +
+                          INNER_SEPARATOR +
+                          bestAskOrder.getSize() +
+                          ENDLINE_SEPARATOR
+                    );
+        }
+
+        return result;
+    }
+    private static Optional<String> executeQueryBestBidCommand(OrderBook book) {
+        Optional<String> result = Optional.empty();
+
+        List<Order> bidOrders = book.getBidOrders();
+        Optional<Order> bestOrderOptional = bidOrders.stream().
+                filter(order -> order.getSize().get() != 0).
+                max(Comparator.comparingLong(ord -> ord.getPrice().get()));
+
+        Order bestOrder;
+        if(bestOrderOptional.isPresent()) {
+            bestOrder = bestOrderOptional.get();
+            result = Optional.of(
+                    bestOrder.getPrice() +
+                          INNER_SEPARATOR +
+                          bestOrder.getSize() +
+                          ENDLINE_SEPARATOR
+            );
+        }
+
+        return result;
+    }
+    private static String executeQuerySizeCommand(Command typedCommand, OrderBook book) throws InvalidPriceStringException {
+        String priceStr = typedCommand.getInstructionAtIndex(2);
+        Price price = Price.parsePrice(priceStr);
+
+        Optional<Order> orderOptional = book.getOrderByPrice(price);
+        if(orderOptional.isPresent()) {
+            Order order = orderOptional.get();
+            return order.getSize() + ENDLINE_SEPARATOR;
+        }
+        return "0" + ENDLINE_SEPARATOR;
+    }
+    private static void executeOrderBuyCommand(Command typedCommand, OrderBook book) throws InvalidSizeStringException, ValueOutOfRangeException {
+        String sizeStr = typedCommand.getInstructionAtIndex(2);
+        Size size = Size.parseSize(sizeStr);
+
+        List<Order> cheapOrders = book.getAskOrders().stream().
+                filter(order -> order.getSize().get() != 0).
+                sorted(Comparator.comparingLong(ord -> ord.getPrice().get())).
+                collect(Collectors.toList());
+        buyShares(size, cheapOrders);
+    }
+    private static void executeOrderSellCommand(Command typedCommand, OrderBook book) throws InvalidSizeStringException, ValueOutOfRangeException {
+        String sizeStr = typedCommand.getInstructionAtIndex(2);
+        Size size = Size.parseSize(sizeStr);
+
+        List<Order> expensiveOrders = book.getBidOrders().stream().
+                filter(order -> order.getSize().get() != 0).
+                sorted(Comparator.comparingLong(ord -> ord.getPrice().get())).
+                collect(Collectors.toList());
+        Collections.reverse(expensiveOrders);
+        buyShares(size, expensiveOrders);
+    }
+
+    private static void buyShares(Size size, List<Order> orders) throws ValueOutOfRangeException {
+        for (Order order : orders) {
+            if (order.getSize().greaterThanOrEqual(size)) {
+                order.buyShares(size);
+                break;
+            }
+            size.subtract(order.getSize());
+            order.setSize(0);
+        }
+    }
+
+    private static void updateOrder(OrderBook book, Price price, Size size, PriceLevelType type) throws ValueOutOfRangeException {
+        Optional<Order> orderFound = book.getOrderByPrice(price);
+        if (orderFound.isPresent()) {
+            Order order = orderFound.get();
+
+            order.setSize(size.get());
+            order.setType(type);
+        }
+        else {
+            book.add(new Order(price, size, type));
+        }
     }
 }

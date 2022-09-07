@@ -21,28 +21,30 @@ public class Main {
     private static final String FILE_COMMANDS_LARGE_SEPARATOR = "\r\n";
 
     public static void main(String[] args) {
+        String result = "";
+
         String commandsStr = readCommands();
-        if (StringUtils.stringIsInvalid(commandsStr))
+        if (StringUtils.stringIsInvalid(commandsStr)) {
             return;
+        }
 
         String[] splittedCommandsStr = splitCommandsString(commandsStr);
         TypedCommand[] typedCommands = getTypedCommands(splittedCommandsStr);
 
-        String result = "";
         try {
             result += executeCommands(typedCommands);
-        } catch (InvalidPriceStringException | InvalidSizeStringException e) {
+        } catch (InvalidPriceStringException | InvalidSizeStringException | ValueOutOfRangeException e) {
             e.printStackTrace();
         }
 
-        if (StringUtils.stringIsInvalid(result))
-            return;
-        result = removeStringLastNewLineCharacter(result);
-
-        createOutputFileIfNotExists();
-        writeResult(result);
+        saveResult(result);
     }
 
+    private static void saveResult(String result) {
+        createOutputFileIfNotExists();
+        String correctResult = removeStringLastNewLineCharacter(result);
+        writeResult(correctResult);
+    }
     public static String readCommands() {
         String absolutePath = new File(INPUT_FILEPATH).getAbsolutePath();
         FileReader reader = new FileReader(absolutePath);
@@ -71,7 +73,8 @@ public class Main {
 
         return typedCommands.toArray(new TypedCommand[0]);
     }
-    public static String executeCommands(TypedCommand[] typedCommands) throws InvalidPriceStringException, InvalidSizeStringException {
+    public static String executeCommands(TypedCommand[] typedCommands) throws InvalidPriceStringException,
+            InvalidSizeStringException, ValueOutOfRangeException {
         OrderBook book = new OrderBook();
         StringBuilder result = new StringBuilder();
 

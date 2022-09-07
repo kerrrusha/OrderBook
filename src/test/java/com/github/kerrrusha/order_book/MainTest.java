@@ -4,6 +4,7 @@ import com.github.kerrrusha.order_book.command.CommandParser;
 import com.github.kerrrusha.order_book.command.typed_command.InvalidPriceStringException;
 import com.github.kerrrusha.order_book.command.typed_command.InvalidSizeStringException;
 import com.github.kerrrusha.order_book.command.typed_command.TypedCommand;
+import com.github.kerrrusha.order_book.command.typed_command.ValueOutOfRangeException;
 import com.github.kerrrusha.order_book.command.typed_command.order.OrderSellCommand;
 import com.github.kerrrusha.order_book.command.typed_command.query.QueryBestBidCommand;
 import com.github.kerrrusha.order_book.command.typed_command.query.QuerySizeCommand;
@@ -71,7 +72,7 @@ class MainTest {
     }
 
     @Test
-    public void executeCommandsTest() throws InvalidPriceStringException, InvalidSizeStringException {
+    public void executeCommandsTest() throws InvalidPriceStringException, InvalidSizeStringException, ValueOutOfRangeException {
         final TypedCommand[] testData = new TypedCommand[] {
                 UpdateBidCommand.parseCommand("u,9,1,bid"),
                 UpdateAskCommand.parseCommand("u,11,5,ask"),
