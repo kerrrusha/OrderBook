@@ -13,12 +13,11 @@ import org.junit.jupiter.api.Test;
 
 import static com.github.kerrrusha.order_book.Main.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MainTest {
-    @Test
-    public void readCommandsTest() {
-        final String NEW_LINE = System.lineSeparator();
-        final String expected = "u,9,1,bid" + NEW_LINE +
+    private String getCommandsStrCustomSeparator(String NEW_LINE) {
+        return "u,9,1,bid" + NEW_LINE +
                 "u,11,5,ask" + NEW_LINE +
                 "q,best_bid" + NEW_LINE +
                 "u,10,2,bid" + NEW_LINE +
@@ -26,10 +25,20 @@ class MainTest {
                 "o,sell,1" + NEW_LINE +
                 "q,size,10" + NEW_LINE +
                 "u,9,0,bid" + NEW_LINE +
-                "u,11,0,ask" + NEW_LINE;
+                "u,11,0,ask";
+    }
+    @Test
+    public void readCommandsTest() {
+        final String WINDOWS_NEW_LINE = "\r\n";
+        final String UNIX_NEW_LINE = "\n";
+
+        final String expectedWindowsNewLine = getCommandsStrCustomSeparator(WINDOWS_NEW_LINE);
+        final String expectedUnixNewLine = getCommandsStrCustomSeparator(UNIX_NEW_LINE);
+
         String actual = readCommands();
 
-        assertEquals(expected, actual, "Incorrect file reading.");
+        assertTrue(expectedWindowsNewLine.equals(actual) ||
+                expectedUnixNewLine.equals(actual), "Incorrect file reading.");
     }
 
     @Test
