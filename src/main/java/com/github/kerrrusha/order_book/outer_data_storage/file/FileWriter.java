@@ -30,8 +30,7 @@ public class FileWriter implements DataWriteable, DataRewritable {
 
     @Override
     public void rewrite(String data) throws DataStorageNotFoundException {
-        try {
-            FileOutputStream outputStream = new FileOutputStream(filepath);
+        try (FileOutputStream outputStream = new FileOutputStream(filepath)){
             byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
             outputStream.write(dataBytes);
         } catch (IOException e) {

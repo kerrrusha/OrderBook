@@ -10,16 +10,16 @@ import java.nio.file.Path;
 public class FileReader implements DataReadable {
     private static final String NOT_FOUND = "File not found at the given filepath";
 
-    private final Path path;
+    private final Path filepath;
 
     public FileReader(String filepath) {
-        path = Path.of(filepath);
+        this.filepath = Path.of(filepath);
     }
 
     @Override
     public String read() throws DataStorageNotFoundException {
         try {
-            return Files.readString(path);
+            return Files.readString(filepath);
         } catch (IOException e) {
             throw new DataStorageNotFoundException(NOT_FOUND);
         }
