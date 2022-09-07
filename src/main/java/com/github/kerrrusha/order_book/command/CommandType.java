@@ -4,7 +4,7 @@ public enum CommandType {
     ANY('_'),
     QUERY('q'),
     ORDER('o'),
-    UPDATE('v');
+    UPDATE('u');
 
     final char CODE;
 

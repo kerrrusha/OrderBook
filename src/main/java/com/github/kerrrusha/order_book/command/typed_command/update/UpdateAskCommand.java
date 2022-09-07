@@ -16,7 +16,7 @@ public class UpdateAskCommand extends UpdateCommand {
 
     public static UpdateAskCommand parseCommand(String commandStr)
             throws InvalidCommandTypeException {
-        TypedCommand.checkCommandString(commandStr);
+        TypedCommand.checkCommandString(commandStr, commandType);
         if (invalidParameters(commandStr))
             throw new InvalidCommandParametersException(INVALID_PARAMETERS);
         return new UpdateAskCommand(commandStr);

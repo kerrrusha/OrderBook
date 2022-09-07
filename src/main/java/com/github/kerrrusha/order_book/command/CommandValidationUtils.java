@@ -1,15 +1,15 @@
 package com.github.kerrrusha.order_book.command;
 
-import com.github.kerrrusha.order_book.StringUtils;
-
 import static com.github.kerrrusha.order_book.command.Command.SEPARATOR;
 
 public class CommandValidationUtils {
     public static boolean invalidCommandType(String commandStr, CommandType commandType) {
-        if (StringUtils.stringIsInvalid(commandStr))
-            return true;
-        if (commandType == CommandType.ANY)
-            return firstParameterIsNotLetter(commandStr);
+        if (commandType == CommandType.ANY) {
+            if (commandStr.length() == 1)
+                return firstParameterIsNotLetter(commandStr);
+            return firstParameterIsNotLetter(commandStr) || secondCharIsNotAnSeparator(commandStr);
+        }
+
         if (commandStr.length() == 1)
             return invalidSingleCase(commandStr, commandType);
         return invalidDefaultCase(commandStr, commandType);
@@ -22,7 +22,10 @@ public class CommandValidationUtils {
         return !commandStr.equals(String.valueOf(commandType));
     }
     private static boolean invalidDefaultCase(String commandStr, CommandType commandType) {
-        return !getCommandTypeWithSeparator(commandStr).equals(String.valueOf(commandType) + SEPARATOR);
+        final String expected = String.valueOf(commandType.CODE) + SEPARATOR;
+        String actual = getCommandTypeWithSeparator(commandStr);
+
+        return !expected.equals(actual);
     }
     private static char getCommandType(String commandStr) {
         return commandStr.charAt(0);
@@ -32,5 +35,8 @@ public class CommandValidationUtils {
     }
     private static boolean firstParameterIsNotLetter(String commandStr) {
         return !Character.isLetter(getCommandType(commandStr));
+    }
+    private static boolean secondCharIsNotAnSeparator(String commandStr) {
+        return commandStr.charAt(1) != SEPARATOR;
     }
 }
