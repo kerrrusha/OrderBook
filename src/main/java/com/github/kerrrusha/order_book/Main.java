@@ -46,11 +46,9 @@ public class Main {
         writeResult(correctResult);
     }
     public static String readCommands() {
-        String absolutePath = new File(INPUT_FILEPATH).getAbsolutePath();
-        FileReader reader = new FileReader(absolutePath);
         String fileContent = "";
         try {
-            fileContent = reader.read();
+            fileContent = new FileReader(new File(INPUT_FILEPATH).getAbsolutePath()).read();
         } catch (DataStorageNotFoundException e) {
             e.printStackTrace();
         }
