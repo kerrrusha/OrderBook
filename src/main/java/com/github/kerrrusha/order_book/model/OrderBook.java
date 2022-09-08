@@ -11,9 +11,6 @@ public class OrderBook {
     public OrderBook() {
         this.orders = new ArrayList<>();
     }
-    public OrderBook(List<Order> orders) {
-        this.orders = orders;
-    }
 
     public Optional<Order> getOrderByPrice(Price price) {
         return orders.stream().filter(t->t.getPrice().equals(price)).findFirst();

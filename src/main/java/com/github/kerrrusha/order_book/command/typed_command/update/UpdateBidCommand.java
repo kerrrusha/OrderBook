@@ -25,12 +25,8 @@ public class UpdateBidCommand extends UpdateCommand {
     private static boolean invalidParameters(String commandStr) {
         Command command = new Command(commandStr);
 
-        String priceStr = command.getInstructionAtIndex(1);
-        String sizeStr = command.getInstructionAtIndex(2);
-        String keywordStr = command.getInstructionAtIndex(3);
-
-        return Price.invalidStringValue(priceStr) ||
-                Size.invalidStringValue(sizeStr) ||
-                !keywordStr.equals(CORRECT_KEYWORD);
+        return Price.invalidStringValue(command.getInstructionAtIndex(1)) ||
+                Size.invalidStringValue(command.getInstructionAtIndex(2)) ||
+                !command.getInstructionAtIndex(3).equals(CORRECT_KEYWORD);
     }
 }

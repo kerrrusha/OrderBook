@@ -23,8 +23,6 @@ public class QueryBestAskCommand extends QueryCommand {
     private static boolean invalidParameters(String commandStr) {
         Command command = new Command(commandStr);
 
-        String keywordStr = command.getInstructionAtIndex(1);
-
-        return !keywordStr.equals(CORRECT_KEYWORD);
+        return !command.getInstructionAtIndex(1).equals(CORRECT_KEYWORD);
     }
 }

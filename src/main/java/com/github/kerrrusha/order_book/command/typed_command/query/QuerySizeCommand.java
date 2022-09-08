@@ -24,10 +24,7 @@ public class QuerySizeCommand extends QueryCommand {
     private static boolean invalidParameters(String commandStr) {
         Command command = new Command(commandStr);
 
-        String keywordStr = command.getInstructionAtIndex(1);
-        String priceStr = command.getInstructionAtIndex(2);
-
-        return !keywordStr.equals(CORRECT_KEYWORD) ||
-                Price.invalidStringValue(priceStr);
+        return !command.getInstructionAtIndex(1).equals(CORRECT_KEYWORD) ||
+                Price.invalidStringValue(command.getInstructionAtIndex(2));
     }
 }

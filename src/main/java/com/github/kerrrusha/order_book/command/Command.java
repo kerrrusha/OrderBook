@@ -1,7 +1,8 @@
 package com.github.kerrrusha.order_book.command;
 
 import com.github.kerrrusha.order_book.StringUtils;
-import com.github.kerrrusha.order_book.model.Price;
+
+import java.util.Objects;
 
 public class Command {
     protected static final char SEPARATOR = ',';
@@ -45,6 +46,6 @@ public class Command {
 
         Command other = (Command) o;
 
-        return this.command == other.command;
+        return Objects.equals(this.command, other.command);
     }
 }

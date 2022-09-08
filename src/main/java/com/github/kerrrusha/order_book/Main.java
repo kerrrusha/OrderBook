@@ -11,8 +11,6 @@ import com.github.kerrrusha.order_book.outer_data_storage.file.FileWriter;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
     private static final String INPUT_FILEPATH = "input.txt";
@@ -28,8 +26,7 @@ public class Main {
             return;
         }
 
-        String[] splittedCommandsStr = splitCommandsString(commandsStr);
-        TypedCommand[] typedCommands = getTypedCommands(splittedCommandsStr);
+        TypedCommand[] typedCommands = getTypedCommands(splitCommandsString(commandsStr));
 
         try {
             result += executeCommands(typedCommands);
@@ -42,8 +39,7 @@ public class Main {
 
     private static void saveResult(String result) {
         createOutputFileIfNotExists();
-        String correctResult = removeStringLastNewLineCharacter(result);
-        writeResult(correctResult);
+        writeResult(removeStringLastNewLineCharacter(result));
     }
     public static String readCommands() {
         String fileContent = "";
@@ -58,18 +54,18 @@ public class Main {
         return CommandParser.parseCommand(commandStr);
     }
     private static TypedCommand[] getTypedCommands(String[] splittedCommandsStr) {
-        List<TypedCommand> typedCommands = new ArrayList<>();
-        for (String commandStr : splittedCommandsStr) {
+        TypedCommand[] typedCommands = new TypedCommand[splittedCommandsStr.length];
+        for (int i = 0; i < splittedCommandsStr.length; i++) {
             TypedCommand command;
             try {
-                command = getTypedCommand(commandStr);
+                command = getTypedCommand(splittedCommandsStr[i]);
             } catch (CommandParseUnsuccessfulException e) {
                 continue;
             }
-            typedCommands.add(command);
+            typedCommands[i] = command;
         }
 
-        return typedCommands.toArray(new TypedCommand[0]);
+        return typedCommands;
     }
     public static String executeCommands(TypedCommand[] typedCommands) throws InvalidPriceStringException,
             InvalidSizeStringException, ValueOutOfRangeException {
@@ -90,10 +86,8 @@ public class Main {
         } catch (Exception ignored) {}
     }
     private static void writeResult(String data) {
-        String absolutePath = new File(OUTPUT_FILEPATH).getAbsolutePath();
-        FileWriter writer = new FileWriter(absolutePath);
         try {
-            writer.rewrite(data);
+            new FileWriter(new File(OUTPUT_FILEPATH).getAbsolutePath()).rewrite(data);
         } catch (DataStorageNotFoundException e) {
             e.printStackTrace();
         }

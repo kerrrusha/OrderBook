@@ -59,36 +59,30 @@ public class CommandOrderBookExecutor implements CommandExecutable {
     }
 
     private static void executeUpdateAskCommand(Command typedCommand, OrderBook book) throws InvalidPriceStringException, InvalidSizeStringException, ValueOutOfRangeException {
-        String priceStr = typedCommand.getInstructionAtIndex(1);
-        String sizeStr = typedCommand.getInstructionAtIndex(2);
-
-        Price price = Price.parsePrice(priceStr);
-        Size size = Size.parseSize(sizeStr);
-        PriceLevelType type = PriceLevelType.ASK;
-
-        updateOrder(book, price, size, type);
+        updateOrder(
+                book,
+                Price.parsePrice(typedCommand.getInstructionAtIndex(1)),
+                Size.parseSize(typedCommand.getInstructionAtIndex(2)),
+                PriceLevelType.ASK
+        );
     }
     private static void executeUpdateBidCommand(Command typedCommand, OrderBook book) throws InvalidPriceStringException, InvalidSizeStringException, ValueOutOfRangeException {
-        String priceStr = typedCommand.getInstructionAtIndex(1);
-        String sizeStr = typedCommand.getInstructionAtIndex(2);
-
-        Price price = Price.parsePrice(priceStr);
-        Size size = Size.parseSize(sizeStr);
-        PriceLevelType type = PriceLevelType.BID;
-
-        updateOrder(book, price, size, type);
+        updateOrder(
+                book,
+                Price.parsePrice(typedCommand.getInstructionAtIndex(1)),
+                Size.parseSize(typedCommand.getInstructionAtIndex(2)),
+                PriceLevelType.BID
+        );
     }
     private static Optional<String> executeQueryBestAskCommand(OrderBook book) {
         Optional<String> result = Optional.empty();
 
-        List<Order> askOrders = book.getAskOrders();
-        Optional<Order> bestAskOrderOptional = askOrders.stream().
+        Optional<Order> bestAskOrderOptional = book.getAskOrders().stream().
                 filter(order -> order.getSize().get() != 0).
                 min(Comparator.comparingLong(ord -> ord.getPrice().get()));
 
-        Order bestAskOrder;
         if(bestAskOrderOptional.isPresent()) {
-            bestAskOrder = bestAskOrderOptional.get();
+            Order bestAskOrder = bestAskOrderOptional.get();
             result = Optional.of(
                     bestAskOrder.getPrice() +
                           INNER_SEPARATOR +
@@ -102,14 +96,12 @@ public class CommandOrderBookExecutor implements CommandExecutable {
     private static Optional<String> executeQueryBestBidCommand(OrderBook book) {
         Optional<String> result = Optional.empty();
 
-        List<Order> bidOrders = book.getBidOrders();
-        Optional<Order> bestOrderOptional = bidOrders.stream().
+        Optional<Order> bestOrderOptional = book.getBidOrders().stream().
                 filter(order -> order.getSize().get() != 0).
                 max(Comparator.comparingLong(ord -> ord.getPrice().get()));
 
-        Order bestOrder;
         if(bestOrderOptional.isPresent()) {
-            bestOrder = bestOrderOptional.get();
+            Order bestOrder = bestOrderOptional.get();
             result = Optional.of(
                     bestOrder.getPrice() +
                           INNER_SEPARATOR +
@@ -121,36 +113,25 @@ public class CommandOrderBookExecutor implements CommandExecutable {
         return result;
     }
     private static String executeQuerySizeCommand(Command typedCommand, OrderBook book) throws InvalidPriceStringException {
-        String priceStr = typedCommand.getInstructionAtIndex(2);
-        Price price = Price.parsePrice(priceStr);
-
-        Optional<Order> orderOptional = book.getOrderByPrice(price);
-        if(orderOptional.isPresent()) {
-            Order order = orderOptional.get();
-            return order.getSize() + ENDLINE_SEPARATOR;
-        }
-        return "0" + ENDLINE_SEPARATOR;
+        Optional<Order> orderOptional = book.getOrderByPrice(Price.parsePrice(typedCommand.getInstructionAtIndex(2)));
+        return orderOptional.map(order -> order.getSize() + ENDLINE_SEPARATOR).orElse("0" + ENDLINE_SEPARATOR);
     }
     private static void executeOrderBuyCommand(Command typedCommand, OrderBook book) throws InvalidSizeStringException, ValueOutOfRangeException {
-        String sizeStr = typedCommand.getInstructionAtIndex(2);
-        Size size = Size.parseSize(sizeStr);
-
-        List<Order> cheapOrders = book.getAskOrders().stream().
-                filter(order -> order.getSize().get() != 0).
-                sorted(Comparator.comparingLong(ord -> ord.getPrice().get())).
-                collect(Collectors.toList());
-        buyShares(size, cheapOrders);
+        buyShares(
+                Size.parseSize(typedCommand.getInstructionAtIndex(2)),
+                book.getAskOrders().stream().
+                        filter(order -> order.getSize().get() != 0).
+                        sorted(Comparator.comparingLong(ord -> ord.getPrice().get())).
+                        collect(Collectors.toList())
+        );
     }
     private static void executeOrderSellCommand(Command typedCommand, OrderBook book) throws InvalidSizeStringException, ValueOutOfRangeException {
-        String sizeStr = typedCommand.getInstructionAtIndex(2);
-        Size size = Size.parseSize(sizeStr);
-
         List<Order> expensiveOrders = book.getBidOrders().stream().
                 filter(order -> order.getSize().get() != 0).
                 sorted(Comparator.comparingLong(ord -> ord.getPrice().get())).
                 collect(Collectors.toList());
         Collections.reverse(expensiveOrders);
-        buyShares(size, expensiveOrders);
+        buyShares(Size.parseSize(typedCommand.getInstructionAtIndex(2)), expensiveOrders);
     }
 
     private static void buyShares(Size size, List<Order> orders) throws ValueOutOfRangeException {

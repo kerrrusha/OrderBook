@@ -24,10 +24,7 @@ public class OrderSellCommand extends OrderCommand {
     private static boolean invalidParameters(String commandStr) {
         Command command = new Command(commandStr);
 
-        String keywordStr = command.getInstructionAtIndex(1);
-        String sizeStr = command.getInstructionAtIndex(2);
-
-        return !keywordStr.equals(CORRECT_KEYWORD) ||
-                Size.invalidStringValue(sizeStr);
+        return !command.getInstructionAtIndex(1).equals(CORRECT_KEYWORD) ||
+                Size.invalidStringValue(command.getInstructionAtIndex(2));
     }
 }
